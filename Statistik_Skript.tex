@@ -1,0 +1,707 @@
+\documentclass[a4paper]{scrartcl}
+
+\usepackage{preamble2_0}
+\usepackage[ngerman]{babel}
+\usepackage[scale=0.75]{geometry}
+
+%\bibliography{lit.bib}
+%------------------------------------------------------------------------------------------
+\title{Methoden der Statistik}
+\author{Sascha Gaudlitz}
+\pagestyle{myheading}
+%-----------------------------------------------------------------------------------------
+
+\begin{document}
+\begin{titlepage}
+\begin{center}
+{\includegraphics[scale=1]{C:/Users/SRG/Pictures/Uni_Logos/husiegel_bw_rgb_op.eps}\par}
+	\vspace{1cm}
+	{\scshape \Large Humboldt-Universität zu Berlin\par}
+	{\scshape Mathematisch-Naturwissenschaftliche Fakultät\par}
+	{\scshape Institut für Mathematik\par}
+	\vspace{1cm}
+	{\scshape \Huge Methoden der Statistik\par}
+	\vspace{1cm}
+	{\scshape \Large gelesen von\par}
+	\vspace{1cm}
+	{\scshape \Huge Prof. Dr. Markus Reiß\par}
+	\vspace{1cm}
+	{\scshape \Large Vorlesung im Wintersemester 2017/18\par}
+	\vspace{2cm}
+	{\scshape \Large Mitschrift von\par}
+	\vspace{1cm}
+	{\scshape \LARGE Sascha Gaudlitz\par}
+\end{center}
+\end{titlepage}
+\thispagestyle{empty}
+%\printbibliography
+\newpage
+\thispagestyle{empty}
+\tableofcontents
+\newpage
+
+%=========================================================================================
+
+\section{Grundbegriffe}
+
+	\subsection{Schätzen und Konfidenz}
+	
+		\begin{motivation}
+			Zeitungsnotiz vom 22.09.2017: "`Aktuelle Wahlprognose sagt für die CDU 36$\%$, SDP 22$\%$, Grüne 8$\%$, FDP 10,5$\%$, Linke 9,5$\%$ and AfD 10$\%$ voraus. Die Unsicherheit liegt bei 2 Prozentpunkten."'
+			
+			Was ist (grob) geschehen?
+			
+			$n=1074$ Wahlberechtigte wurden zufällig ausgewählt und davon hat ein entsprechender Anteil sich für die jeweilige Partei entschieden.
+			
+			Dies ergibt die entsprechenden Schätzwerte, was so keiner weiteren Mathematik bedarf. Wichtig ist aber die angegebene Unsicherheit von 2 Prozentpunkten, um potentielle Koalitionen oder Scheitern an der 5$\%$-Hürde einschätzen zu können.
+			
+			Wir benötigen nun ein mathematischen Modell. Wir betrachten der Einfachheit halber nur eine (beliebige) Partei und stellen Folgendes Modell auf:
+			
+			Es gibt $N$ Wahlberechtigte, von denen $N_P$ die Partei wählen. Erhalte nun $X$ Wähler der Partei in der Stichprobe von $n$ Befragten.
+			
+			\emph{Bevor} die Befragung startet, ist die Anzahl $X$ zufällig. Wie ist $X$ verteilt? Wenn wir die $n$ Befragten "`mit Zurücklegen"' aus der Wählerschaft ziehen, so ist $X\sim \text{Bin}(n,p)$ mit Erfolgswahrscheinlichkeit
+			\begin{align*}
+				p=\frac{N_P}{N}
+			\end{align*}
+			Beachte also, dass $p\in[0,1]$ unbekannt und zu schätzen ist. Unser Schätzer lautet $\hat{p}=X/n$. Allgemein ist ein Schätzer eine (messbare) Funktion er Beobachtungen:
+		\end{motivation}
+		\begin{definition}
+			Sei $\seq{P_\theta}{\theta}{\Theta}$ eine Familie von \Wk smaßen auf einem Messraum $(\mathcal{X},\mathscr{F})$. Dann heißt $(\mathcal{X},\mathscr{F},\seq{P_\theta}{\theta}{\Theta})$ ein \emph{statistisches Modell} (oder auch \emph{statistisches Experiment}). $(\mathcal{X},\mathscr{F})$ oder auch nur $\mathcal{X}$ heißt \emph{Stichprobenraum}, $\Theta\neq\emptyset$ \emph{Parametermenge} und $\theta\in\Theta$ \emph{Parameter}. Ist $\mathscr{F}_\Theta$ $\sigma$-Algebra üder $\Theta$, so heißt jede $(\mathscr{F},\mathscr{F}_\Theta)$-messbare Funktion
+			\begin{align*}
+				\hat{\theta}\colon~X\to\Theta
+			\end{align*}
+			\emph{Schätzer} von $\theta$.
+		\end{definition}
+		\begin{example}
+			Zurück zu unserem Wahlbeispiel. Hier ist
+			\begin{align*}
+				\mathcal{X}=\{0,\dots,n\},~\mathscr{F}=\Pot{\mathcal{X}},~\Theta=[0,1],~\mathscr{F}_\Theta=\mathscr{B}_\Theta \text{ und }p=\theta\in[0,1]\text{ der unbekannte Parameter}
+			\end{align*}
+			Zudem ist das Wahrscheinlichkeitsmaß $P$ eine Binomialverteilung abhängig von $p$, der "`wahren Erfolgswahrscheinlichekeit"':
+			\begin{align*}
+				P=P_\theta=\text{Bin}(n,p)
+			\end{align*}
+			Unser Schätzer ist nun:
+			\begin{align*}
+				\hat{\theta}(k)=\hat{p}(k)\coloneq\frac{k}{n}\text{ for all }k\in\mathcal{X}=\{0,\dots,n\}
+			\end{align*}
+			Beachte, dass unter jedem $P_\theta$ ein Schätzer $\hat{\theta}$ eine Zufallsvariable ist. Wir wollen nun die Eigenschaften des Schätzers $\hat{p}$ untersuchen.
+		\end{example}
+		\begin{definition}
+			Ist $\Theta\in\mathscr{B}_\mathbb{R}$ und $\mathscr{F}_\Theta=\mathscr{B}_\Theta$, so heißt ein Schätzer $\hat{\theta}$ von $\theta$ \emph{erwartungstreu} (oder auch \emph{unverzerrt, unbiased}), falls
+			\begin{align*}
+				\forall\theta\in\Theta\colon~\mathrm{E}_\theta\left[\hat{\theta}\right]\coloneq \int_\mathcal{X}\hat{\theta}(x)P_\theta(dx)=\theta
+			\end{align*}
+			gilt.
+		\end{definition}
+		\begin{example}
+			In unserem Beispiel gilt für usneren Schätzer $\hat{p}(k)=k/n$:
+			\begin{align*}
+				\mathrm{E}_p\left[\hat{p}\right]=&\sum_{k=0}^n\binom{n}{k}p^k(1-k)^{n-k}\hat{p}(k)\\
+				=&\frac{1}{n}\EW{X}\text{ mit }X\sim\text{Bin}(n,p)\\
+				=&p
+			\end{align*}
+			für $p\in[0,1]$ beliebig. Somit ist $\hat{p}$ erwartungstreu in unserem mathematischen Modell.
+		\end{example}
+		\begin{remark}
+			Erwartungstreue Schätzer besitzen keinen \emph{systematischen Fehler}, d.h. sie unter- oder überschätzen den Parameter nicht im MIttel (anders als z.B. ein nichtgeeichtes Messinstrument). Bei großem Stichprobenumfang $n$ ist eine erstrebenswerte Eigenschaft die \emph{asymptotische Konsistenz}:
+		\end{remark}
+		\begin{definition}
+			Ist $\Theta\in\mathscr{B}_\mathbb{R}$, $\mathscr{F}_\Theta=\mathscr{B}_\Theta$ und ist $\left(\mathcal{X}_n,\mathscr{F}_n,\seq{P_\theta^n}{\theta}{\Theta}\right)_{n\ge 1}$ eine Folge von statistischen Modellen, so heißt eine Folge $\seq{\hat{\theta}_n}{n}{\mathbb{N}}$ auf $\mathscr{F}_\Theta=\mathscr{B}_\Theta$ und ist $\left(\mathcal{X}_n,\mathscr{F}_n,\seq{P_\theta^n}{\theta}{\Theta}\right)_{n\ge 1}$ \emph{konsistent}, falls
+			\begin{align*}
+				\hat{\theta}_n\xrightarrow{P_\theta^n}\theta
+			\end{align*}
+			für alle $\theta\in\Theta$ gilt. Dabei ist die stochastische Konvergenz definiert als:
+			\begin{align*}
+				\hat{\theta}_n\xrightarrow{P_\theta^n}\theta\colon\Leftrightarrow\forall\epsilon>0\colon~\lim_{n\to\infty}P_\theta^n\left(\left|\hat{\theta}_n-\theta\right|>\epsilon\right)=0
+			\end{align*}
+		\end{definition}
+		\begin{example}
+			In unserem Wahlprognosenbeispiel gilt:
+			\begin{align*}
+				P_p^n\left(\left|\hat{p}^n-p\right|>\epsilon\right)\le&\frac{\text{Var}_p\left(\hat{p}^n\right)}{\epsilon^2}\quad\text{nach der Tschebyschew-Ungleichung}\\
+				=&\frac{np(1-p)}{n^2\epsilon^2}\\
+				&\xrightarrow{n\to\infty}0
+			\end{align*}
+			Damit ist $\hat{p}$ ein konsistenter Schätzer.
+		\end{example}
+		\begin{remark}
+			Wenn wir ein Gesetz der großen Zahlen zum Nachweis der Konsistenz verwenden möchten, so müssen wir uns hier auf ein $\infty$-langes Bernoulli-Schema stützen, d.h. das Modell$\left(\{0,1\}^\mathbb{N},(\Pot{\{0,1\}})^{\otimes\mathbb{N}},(\text{Bin}(1,p))_{p\in[0,1]}^{\otimes\mathbb{N}}\right)$. Für $x\in\{0,1\}^\mathbb{N}$ betrachte dann für $x=\seq{x_i}{i}{\mathbb{N}}$
+			\begin{align*}
+				X_n(x)=\sum_{i=1}^n
+			\end{align*}
+			Dann sind unter $(\text{Bin}(1,p))^{\otimes \mathbb{N}}$ die $X_n$ Bin$(n,p)$-verteilte Zufallsvariablen.
+			
+			$X_n$ erzeugt ein eigenes statistisches Modell, nämlich 
+			\begin{align*}
+				\left(\{0,\dots,n=,\Pot{\{0,\dots,n\}},\seq{P_p^{X_n}}{p}{[0,1]}\right)
+			\end{align*}
+			wobei $P_p^{X_n}$ die Verteilung von $X_n$ unter $P_p=(\text{Bin}(1,p))^{\otimes \mathbb{N}}$ ist.
+		\end{remark}
+		\begin{definition}
+			Ist $(\mathcal{X},\mathscr{F},\seq{P_\theta}{\theta}{\Theta})$ ein statistisches Modell und $(\tilde{\mathcal{X}},\tilde{\mathscr{F}})$ ein weiterer Messraum, so heißt jede $(\mathscr{F},\tilde{\mathscr{F}})$-messbare Funktion $T\colon~\mathcal{X}\to\tilde{\mathcal{X}}$ \emph{Statistik}. Das von der Statistik $T$ generierte statistische Modell ist $\left(\tilde{\mathcal{X}},\tilde{\mathscr{F}},\seq{P_\theta^T}{\theta}{\Theta}\right)$. Bei der Angabe einer Statistik wird das Ausgangsmodell oft nicht explizit erwähnt.
+		\end{definition}
+		\begin{example}
+			Bei der Wahlprognose reicht es zu sagen, dass die Bin$(n,p)$-verteilte Statistik $X$ mit $p\in[0,1]$ unbekannt beobachtet wird.
+			
+			Unter $P_p$ gilt nach dem schwachen Gesetz der großen Zahlen, dass
+			\begin{align*}
+				\hat{p}_n\xrightarrow{P_p}\mathrm{E}_p\left[\hat{p}_n\right]=p,
+			\end{align*}
+			was 
+			\begin{align*}
+				\frac{X_n}{n}\xrightarrow{P_p^{\hat{p}_n}}p
+			\end{align*}
+			impliziert.
+		\end{example}
+		\begin{motivation}
+			Wie können wir die Genauigkeit des Schätzers $\hat{p}$ bzw seine statistische Unsicherheit messen? EIn Standardmaß ist die Varianz bzw. Standardabweichung. Wir erhalten im Beispiel zur Wahlprognose:
+			\begin{align*}
+				\text{Var}_p(\hat{p})=\text{Var}\left(\frac{X}{n}\right)=\frac{np(1-p)}{n^2}=\frac{p(1-p)}{n}\Rightarrow\sigma_p(\hat{p})=\sqrt{\frac{p(1-p)}{n}}
+			\end{align*}
+			Beachte, dass die Varianz vom wahren Parameter abhängt und eine umgekehrte Parabel mit Maximum $(1/2,1/(4n))$ ist.
+			
+			Um auf der sicheren Seite zu sein, kann man daher nur angeben, dass die Standardabweichung maximal $1/(2\sqrt{n})$ beträgt. Um eine Standardabweichung von maximal 2 Prozentpunkten (d.h. 0,02) zu gewährleisten, benötigen wir mindestens den Stichprobenumfang $n$ mit $1/(2\sqrt{n})=0.02$, d.h. $n=625$. Ein allgemeines Gütemaß (auch für nicht-erwartungstreue Schätzer), ist der mittlere quadratische Fehler (MSE):
+		\end{motivation}
+		\begin{definition}
+			Ist $\hat{\theta}$ ein Schätzer eines reellen Parameters $\theta$ und gilt $\hat{\theta}\in\mathrm{L}^2\left(P_\theta\right)$ für all $\theta\in\Theta$, so ist der \emph{mittlere quadratische Fehler} (\emph{MSE: mean squared error}) gegeben durch:
+			\begin{align*}
+				R(\theta,\hat{\theta})\coloneq \mathrm{E}_\theta\left[\left(\hat{\theta}-\theta\right)^2\right]
+			\end{align*}
+		\end{definition}
+		\begin{theorem}[Bias-Variant-Zerlegung]
+			Es gilt
+			\begin{align*}
+				\mathrm{E}_\theta\left[\left(\hat{\theta}-\theta\right)\right]=\underbrace{\left(\mathrm{E}_\theta\left[\hat{\theta}\right]-\theta\right)^2}_{\text{quadrierter Bias}}+\underbrace{\text{Var}_\theta\left(\hat{\theta}\right)}_{\text{Varianz}}
+			\end{align*}
+			Ist $\hat{\theta}$ erwartungstreu gilt also $R(\theta,\hat{\theta})=\text{Var}_\theta(\hat{\theta})$.
+		\end{theorem}
+		\begin{proof}
+			We have:
+			\begin{align*}
+				\mathrm{E}_\theta\left[\left(\hat{\theta}-\theta\right)\right]&\mathrm{E}_\theta\left[\left(\hat{\theta}-\mathrm{E}_\theta\left[\hat{\theta}\right]+\mathrm{E}_\theta\left[\hat{\theta}\right]-\theta\right)^2\right]\\
+				=&\mathrm{E}_\theta\left[\left(\hat{\theta}-\mathrm{E}_\theta\left[\hat{\theta}\right]\right)^2\right]+\mathrm{E}_\theta\left[\left(\mathrm{E}_\theta\left[\hat{\theta}\right]-\theta\right)^2\right]+2\mathrm{E}_\theta\left[\left(\hat{\theta}-\mathrm{E}_\theta\left[\hat{\theta}\right]\right)\left(\mathrm{E}_\theta\left[\hat{\theta}\right]-\theta\right)\right]\\
+				=&\text{Var}_\theta\left(\hat{\theta}\right)+\left(\mathrm{E}_\theta\left[\hat{\theta}\right]-\theta\right)^2+2\left(\mathrm{E}_\theta\left[\hat{\theta}\right]-\theta\right)\underbrace{\mathrm{E}_\theta\left[\hat{\theta}-\mathrm{E}_\theta\left[\hat{\theta}\right]\right]}_{=0}
+			\end{align*}
+		\end{proof}
+		\begin{motivation}
+			Gibt es andere Schätzer als $\hat{p}$ im Wahlprognosenbeispiel mit kleinerem MSE? Der triviale Schätzer ist $\tilde{p}=0,1$ unabhängig von den Beobachtungen $X$. Dann gilt Var$_p(\tilde{p})=0$ für alle $p\in[0,1]$. Es folgt also:
+			\begin{align*}
+				R(p,\tilde{p})=\text{BIAS}^2=(0,1-p)^2
+			\end{align*}
+			im Vergleich zu
+			\begin{align*}
+				R(p,\hat{p})=\text{VAR}=\frac{p(1-p)}{n}
+			\end{align*}
+			Falls das wahre $p$ in einer Umgebung von 0,1 liegt, ist $\tilde{p}$ bzgl. MSE besser als $\hat{p}$. Beachte allerdings, dass $\tilde{p}$ weder erwartungstreu, noch konsistent ist.
+			
+			Es gibt zwei Standardansätze, um Schätzer bzgl. MSE zu vergleichen, den worst-case und den average-case Ansatz:
+		\end{motivation}
+		\begin{definition}
+			Ein Schätzer $\hat{\theta}$ eines reellen Parameters $\theta$ heißt \emph{minimax} (bzgl. MSE), falls für jeden anderen Schätzer $\bar{\theta}$ von $\theta$ gilt:
+			\begin{align*}
+				\sup_{\theta\in\Theta}R(\theta,\hat{\theta})\le\sup_{\theta\in\Theta}R(\theta,\bar{\theta}),
+			\end{align*}
+			d.h.
+			\begin{align*}
+				\sup_{\theta\in\Theta}R(\theta,\hat{\theta})=\inf_{\bar{\theta}\text{ Schätzer}}\sup_{\theta\in\Theta}R(\theta,\bar{\theta})
+			\end{align*}
+		\end{definition}
+		\begin{example}
+			In der Übung sehen wir dass, $\hat{p}$ nich minimax-Schätzer von $p$ im Wahlprognosenbeispiel ist!
+		\end{example}
+		\begin{definition}
+			Die Parametermenge $\Theta$ sei mit einer $\sigma$-Algebra $\mathscr{F}_\Theta$ versehen. Dann heißt ein \Wk smaß $\pi$ auf $\mathscr{F}_\Theta$ \emph{a-priori-Verteilung} des Parameters. Ein Schätzer $\hat{\theta}_\pi$ heißt dann \emph{Bayes-optimal} (bzgl. $\pi$ and MSE), falls für alle anderen Schätzer $\bar{\theta}$ gilt:
+			\begin{align*}
+				\int_\Theta R(\theta,\hat{\theta})\pi(d\theta)\le \int_\Theta R(\theta,\bar{\theta})\pi(d\theta),
+			\end{align*}
+			d.h.
+			\begin{align*}
+				\int_\Theta R(\theta,\hat{\theta})\pi(d\theta)=\inf_{\bar{\theta}\text{ Schätzer}}\int_\Theta R(\theta,\bar{\theta})\pi(d\theta)
+			\end{align*}
+		\end{definition}
+		\begin{example}
+			Ist $\hat{p}$ Bayes-optimaler Schätzer im Wahlprognosenbeispiel für die a-priori-Verteilung $\pi=U([0,1])$?
+			
+			Dazu bestimmen wir den Bayes-Schätzer $\hat{p}_\pi$:
+			
+			Für jeden Schätzer $\bar{p}$ gilt:
+			\begin{align*}
+				\int_0^1\mathrm{E}_p\left[\left(\bar{p}-p\right)^2\right]\pi(dp)=&\int_0^1\sum_{k=0}^n\binom{n}{k}p^k(1-p)^{n-k}\left(\bar{p}(k)-p\right)^2dp\\
+				=&\sum_{k=0}^n\binom{n}{k}\underbrace{\int_0^1 p^k(1-p)^{n-k}\left(\bar{p}(k)-p\right)^2dp}_{=\colon I}\\
+				&\rightarrow \text{argmin}_{\bar{p}}!
+			\end{align*}
+			Dazu finde für jedes $k$ ein $p_k$, dass $I$ in $\bar{p}(k)$ minimiert und setze dann $\bar{p}(k)=p_k$. Setze die erste Ableitung gleich null:
+			\begin{align*}
+				&\int_0^1p^k(1-p)^{n-k}2(p_k-p)dp=0\\
+				&\Leftrightarrow p_k=\frac{\int_0^1p^{k+1}(1-p)^{n-k}dp}{\int_0^1p^k(1-p)^{n-k}dp}=\frac{B(k+2,n-k+1)}{B(k+1,n-k+1)}=\frac{k+1}{n+2}
+			\end{align*}
+			wobei $B$ die Beta-Funktion ist. Somit ist
+			\begin{align*}
+				\hat{p}_\pi=\frac{X+1}{n+2}
+			\end{align*}
+			Bayes-optimal bzgl. $\pi=U([0,1])$. Es bietet sich folgende Interpretation an:
+			\begin{align*}
+				\hat{p}_\pi=\underbrace{\frac{n}{n+2}\frac{X}{n}+\frac{2}{n+2}\frac{1}{2}}_{\substack{\text{Konvex-Kombination}\\\text{von }\frac{X}{n}\text{ (erwartungstreu!)}\\\text{und }\frac{1}{2}\text{ (deterministisch)}}}=\underbrace{\frac{X}{n}+\frac{2}{n+2}\left(\frac{1}{2}-\frac{X}{n}\right)}_{\substack{\text{Ziehe den Schätzer in}\\\text{Richtung }\frac{1}{2}\text{, um die dortige}\\\text{maximale Varianz zu verrignern}}}
+			\end{align*}
+			Bayes-Schätzer sind (quasi) nie erwartungstreu und haben oft die Eigenschaft, durch Verzerrung (Bias) die Varianz zu verringern ("`shrinkage estimator"', "`ridge regression"').
+		\end{example}
+		\begin{motivation}
+			Da $\pi$ ein \Wk smaß auf $(\Theta,\mathscr{F}_\Theta)$ ist, sowie jedes $\theta\in\Theta$ ein \Wk smaß $P_\theta$ auf $(\mathcal{X},\mathscr{F})$ definiert, liegt es nahe, folgendes \Wk smaß auf dem Produktraum $(\Theta\times\mathcal{X},\mathscr{F}_\Theta\otimes\mathscr{F})$, die gemeinsame Verteilung von Parameter und Beobachtung, zu definieren:
+			\begin{align*}
+				P_\pi(A\times B)\coloneq \int_A P_\theta(B)\pi(d\theta)
+			\end{align*}
+			für $A\times B\in \mathscr{F}_\Theta\otimes\mathscr{F})$. Dazu wird benötigt, dass $\theta\mapsto P_\theta(B)$ für alle $B\in\mathscr{F}$ messbar ist (also $P_\theta(B)$ Markovkern ist).
+		\end{motivation}
+		\begin{definition}
+			Im statistischen Modell $(\mathcal{X},\mathscr{F},\seq{P_\theta}{\theta}{\Theta})$ möge jedes $P_\theta$ eine Dichte $p_\theta$ bzgl. einem Maß $\mu$ auf $(\mathcal{X},\mathscr{F})$ besitzen, sodass $\theta\mapsto p_\theta(x)$, $x\in\mathcal{x}$, stets messbar ist. Die a-priori Verteilung $\pi$ besitze eine Dichte $\pi$ auf $(\Theta,\mathscr{F}_\Theta)$ bzgl. einem Maß $\nu$. Dann heißt die $\nu$-Dichte
+			\begin{align*}
+				f(\theta|x)\coloneq\frac{p_\theta(x)\pi(\theta)}{\int_\Theta p_\theta(x)\pi(\theta)\nu(d\theta)},\quad \theta\in\Theta
+			\end{align*}
+			\emph{a-posteriori-Dichte} und das zugehörige \Wk smaß
+			\begin{align*}
+				\Pi(B|x)=\coloneq \int_B f(\theta|x)\nu(dx)
+			\end{align*}
+			\emph{a-posteriori-Verteilung} des Parameters $\theta$ auf $\Theta$ gegeben die Beobachtung $x\in\mathcal{X}$.
+		\end{definition}
+		\begin{remark}
+			$f(\cdot|x)$ ist für $\mu$-fast-alle $x\in\mathcal{X}$ wohldefiniert.
+		\end{remark}
+		\begin{example}
+			$P_p=\text{Bin}(n,p)$, $p\sim U([0,1])=\pi$. Dann ist für $\nu$ das Lebesquemaß
+			\begin{align*}
+				\pi(p)=\indicator_{[0,1]}(p)
+			\end{align*}
+			$P_p$ hat die Dichte
+			\begin{align*}
+				p_p(k)=\binom{n}{k}p^k(1-p)^{n-k}
+			\end{align*}
+			bzgl. des Zählmaßes $\mu$ auf $\{0,\dots,n\}$. Somit ist die a-posteriori-Dichte gegeben durch:
+			\begin{align*}
+				f(p|k)\propto \binom{n}{k}p^k(1-p)^{n-k}\indicator_{[0,1]}(p)\propto p^k(1-p)^{n-k}\indicator_{[0,1]}(p)
+			\end{align*}
+			Daraus folgt, dass $f(p|k)$ die Dichte der $B(k+1,n-k+1)$-Verteilung ist.
+		\end{example}
+		\begin{motivation}
+			Gibts es auch andere Methoden, die ohne die subjektiive Wahl einer a-priori-Verteilung auskommen und sinnvolle Schätzer liefern?
+			
+			Im Beispiel war $X\sim$Bin$(n,p)$ mit $p\in[0,1]$ unbekannt. Als Ergebnis erhalten wir einen Wert $k\in\{0,\dots,n\}$. Eine sinnvolle Möglichkeit ist es, $p\in[0,1]$ so zu bestimmen, dass $P_p(X=k)$ maximal ist, d.h. die Zähldichte
+			\begin{align*}
+				\binom{n}{k}p^k(1-p)^{n-k}\rightarrow \text{argmax}_{p\in{[0,1]}}
+			\end{align*}
+		\end{motivation}
+		\begin{definition}
+			Ist $(\mathcal{X},\mathscr{F},\seq{P_\theta}{\theta}{\Theta})$ ein statistisches Modell und besitzt jedes $P_\theta$ eine Dichte $p_\theta$ bzgl. einem Maß $\mu$, so heißt die zufällige Funktion
+			\begin{align*}
+				L\colon~\Theta\to\mathbb{R},~\theta\mapsto L(\theta)\coloneq L(\theta,x)=p_\theta(x)
+			\end{align*}
+			\emph{Likelihood-Funktion}. $\hat{\theta}$ heißt \emph{Maximum-Likelihood-Schätzer (MSE)}, falls gilt:
+			\begin{align*}
+				L(\hat{\theta}(x),x)=\sup_{\theta\in\Theta}L(\theta,x)
+			\end{align*}
+			für $\mu$-fast-alle $x\in\mathcal{X}$.
+		\end{definition}
+		\begin{example}
+			Die Verteilung $P_p=$Bin$(n,p)$ hat die Dichte
+			\begin{align*}
+				\binom{n}{k}p^k(1-p)^{n-k}
+			\end{align*}
+			bzgl dem Zählmaß $\mu$. Eine Likelihood-Funktion ist also im Allgemeinen beschrieben durch:
+			\begin{align*}
+				L(p)=\binom{n}{X}p^X(1-p)^{n-X},\quad p\in[0,1]
+			\end{align*}
+			Der MLE maximiert nun $L(p,X)$, was äquivalent ist mit der Maximierung der \emph{Loglikelihood-Funktion}:
+			\begin{align*}
+				l(p,X)\coloneq \log{L(p,X)}\rightarrow \text{argmax}_{p\in[0,1]}
+			\end{align*}
+			Wir haben:
+			\begin{align*}
+				l(p)=l(p,X)=\log{\binom{n}{X}}+X\log{p}+(n-X)\log{1-p}
+			\end{align*}
+			Aus dem Nullsetzen der ersten Ableitung folgt:
+			\begin{align*}
+				&0\overset{!}{=}\frac{d}{dp}l(p)=\frac{X}{p}-\frac{n-X}{n-p}\\
+				&\Rightarrow \hat{p}\coloneq \frac{X}{n}\text{ maximiert }l(p)
+			\end{align*}
+			Somit ist $\hat{p}$ MLE.
+		\end{example}
+		\begin{remark}~\\
+			\begin{enumerate}[a)]
+				\item Die Dichten $p_\theta$ sind nur $\mu$-fast-überall eindeutig definiert und somit auch der MLE. Meist ist es z.B. kanonisch, eine stetige Dichte zu wählen. Beachte, dass der Schätzer $\hat{\theta}$ \emph{vor} der Beobachtung von $X$ festgelegt wir und jede $\mu$-Nullmenge auch eine $P_\theta$-Nullmenge ist. Damit hat die Änderung von $\hat{\theta}$ auf einer Nullmenge $P_\theta$-fast-sicher keine Auswirkungen.
+				\item Insbesondere für stetige Verteilungen $P_\theta$ kann der MLE schlechte Eigenschaften haben. Oft liefert die Maximum-Likelihood-Methode aber sinnvolle und gute Schätzer, die automatisch aus dem Modell bestimmt werden können.
+				\item Der MLE ist MAP-Schätzer ("`maximum a-posteriori"') im Bayes-Modell mit uniformer a-priori-Verteilung.
+			\end{enumerate}
+		\end{remark}
+		\begin{remark}
+			Der MLE hängt in folgendem Sinne nicht von der von Wahl des Maßes $\mu$ ab:
+			
+			Seien $L_1,L_2$ Likelihood-Funktionen bzgl. Maßen $\mu_1,\mu_2$ sowie $L_3$ Likelihood-Funktion bzgl. $\mu_3=\mu_1+\mu_2$. Nach dem dem Satz von Radon-Nikodym gilt dann:
+			\begin{align*}
+				L_3(\theta,x)=\frac{dP_\theta}{d\mu_3}(x)=\frac{dP_\theta}{d\mu_1	}(x)\cdot\frac{d\mu_1}{d\mu_3}(x)=L_1(\theta,x)\cdot \frac{d\mu_1}{d\mu_3}(x)
+			\end{align*}
+			für $\mu_1$- bzw. $\mu_3$-fast-alle $x\in X$. Damit gilt
+			\begin{align*}
+				\hat{\theta}_3(x)=\hat{\theta}_1(x)\text{ auf }\left\{\frac{d\mu_1}{d\mu_3}>0\right\}~\mu_1\text{-bzw. }\mu_3\text{-fast-überall}
+			\end{align*}
+			Beachte, dass
+			\begin{align*}
+				\left\{\frac{d\mu_1}{d\mu_3}=0\right\}\subset\bigcap_{\theta\in\Theta}\left\{L_3(\theta)=0\right\}
+			\end{align*}
+			und somit
+			\begin{align*}
+				&\forall \theta\in\Theta\colon~P_\theta\left(\left\{\frac{d\mu_1}{d\mu_3}=0\right\}\right)=0\\
+				&\Rightarrow \hat{\theta}_1(x)=\hat{\theta}_3(x)=\hat{\theta}_2(x)\text{ für }\seq{P_\theta}{\theta}{\Theta}\text{-fast-alle }x\in X
+			\end{align*}
+			also
+			\begin{align*}
+				\forall\theta\in\Theta\colon P_\theta \left(\hat{\theta}_1=\hat{\theta}_2\right)=1
+			\end{align*}
+		\end{remark}
+		\begin{motivation}
+			Kommen wir nun zurück zur Bestimmung der Unsicherheit eines Schätzers. Bislang haben wir nur das grobe Kriterium MSE bzg. Varianz betrachtet. Eine präzisere und natürlichere Beschreibung erfolgt durch \emph{Konfidenzmengen}.
+		\end{motivation}
+		\begin{definition}
+			Zu gegebenem $\alpha\in (0,1)$ sei $C_{1-\alpha}(x)\subset\Theta$ eine Teilmenge im Parameterraum für alle $x\in \mathcal{X}$. Dann heißt die zufällige (d.h. datenabhängige) Menge $C_{1-\alpha}$ \emph{$(1-\alpha)$-Konfidenzmenge} (\emph{Konfidenzmenge zum Niveau $1-\alpha$} oder mit \emph{Überdeckungswahrscheinlichkeit $1-\alpha$}), falls gilt:
+			\begin{align*}
+				\forall\theta\in\Theta\colon~P_\theta\left(\theta\in C_{1-\alpha}\right)=P_\theta\left(\left\{x\in\mathcal{X}\middle|~\theta\in C_{1-\alpha}(x)\right\}\right)\ge 1-\alpha
+			\end{align*}
+		\end{definition}
+		\begin{remark}~\\
+			\begin{enumerate}[a)]
+				\item Implizit fordern wir, dass
+				\begin{align*}
+					\left\{x\in\mathcal{X}\middle|~\theta\in C_{1-\alpha}(x)\right\}\in\mathscr{F}
+				\end{align*}
+				für alle $\theta\in\Theta$.
+				\item $C_{1-\alpha}\coloneq\Theta$ ist stets eine $(1-\alpha)$-Konfidenzmenge. Wir streben aber möglichst kleine Konfidenzmengen an, oft unter geometrischen Zusatzanforderungen, wie z.B., dass $C_{1-\alpha}(x)$ ein Intervall oder eine konvexe Menge ist.
+				\item Ist $C_{1-\alpha}(x)$ eine Realisierung (nach Datenerhebung) einer $(1-\alpha)$-Konfidenzmenge, so heißt dass \emph{nicht}, dass $\theta$ mit \Wk~$(1-\alpha)$ in $C_{1-\alpha}(x)$ liegt!
+				
+				Es gibt aber gar kein \Wk smaß auf $\Theta$ in dieser Modellierung. Vielmehr ist $C_{1-\alpha}$ \emph{vor} der Datenerhebung so konstruiert, dass es für jeden möglichen Parameterwert $\theta$ diesen mit \Wk~$\ge 1-\alpha$ enthält.
+				\item Das Bayessche Analogon ist ein "`\emph{credible set}"' $C_{1-\alpha}$, wo gefordert wird, dass
+				\begin{align*}
+					\int_\Theta P_\theta\left(\theta\in C_{1-\alpha}\right)\pi(d\theta)\ge 1-\alpha
+				\end{align*}
+			\end{enumerate}
+		\end{remark}
+		\begin{example}
+			Betrachte wieder $P_p=$Bin$(n,p)$, $p\in[0,1]$ unbekannter Parameter. Wir benutzen folgenden Ansatz für ein $(1-\alpha)$-Konfidenzintervall $I_{1-\alpha}$:
+			\begin{align*}
+				I_{1-\alpha}\coloneq \left[\hat{p}-a(\hat{p}),\hat{p}+a(\hat{p})\right]
+			\end{align*}
+			mit $\hat{p}=X/n$ und evtl. zufälliger Länge $2a(\hat{p})$. Nun ist die Binomialverteilung schwer explizit zu behandeln und wir nähern sie gemäß Zentralen Grenzwertsatz durch die Normalverteilung an ("`Normal approximation"'). Ersetze daher $X\sim$Bin$(n,p)$ durch $np+\sqrt{np(1-p)}Z$ mit $Z\sim N(0,1)$. Dann folgt:
+			\begin{align*}
+				\hat{p}=\frac{X}{n}\Rightarrow \hat{p}\approx p+\sqrt{\frac{p(1-p)}{n}}Z
+			\end{align*}
+			Dann folgt:
+			\begin{align*}
+				1-\alpha\le \inf_{p\in[0,1]}P_p\left(p\in I_{1-\alpha}\right)=\inf_{p\in[0,1]}P_p\left(|\hat{p}-p|\le a(\hat{p})\right)
+			\end{align*}
+			Letzteres ist näherungsweise
+			\begin{align*}
+				\inf_{p\in[0,1]}P\left(|Z|\le \sqrt{\frac{n}{p(1-p)}}a(\hat{p})\right)
+			\end{align*}
+			Verwende nun die $\tilde{\alpha}$-Quantile $q_{\tilde{\alpha}}$ von $N(0,1)$, d.h.
+			\begin{align*}
+				P(Z\le q_{\tilde{\alpha}})\overset{!}{=}\tilde{\alpha},\quad\tilde{\alpha}\in[0,1]
+			\end{align*}
+			Dann gilt aus Symmetriegründen:
+			\begin{align*}
+				P\left(|Z|\le q_{1-\alpha/2}\right)=1-\alpha
+			\end{align*}
+			z.B. für $\alpha=0,05$ ist $q_{\alpha-1/2}=q_{0,975}\approx 1,96$. Nun gibt es folgende Möglichkeiten:
+			\begin{enumerate}[1)]
+				\item Verwende, dass $p(1-p)\le 1/4$ und setze
+				\begin{align*}
+					I_{1-\alpha}=\left[\hat{p}-\frac{q_{1-\alpha/2}}{2\sqrt{n}},\hat{p}+\frac{q_{1-\alpha/2}}{2\sqrt{n}}\right]
+				\end{align*}
+				Dies ist, modulo Normalapproximation, ein $(1-\alpha)$-Konfidenzintervall für $p$. Allerdings ist es "`sehr konservativ"', d.h. für viele Werte  von $p$ ist die Überdeckungswahrscheinlichkeit sehr viel größer als $1-\alpha$. Der Grund ist $p(1-p)\ll 1/4$ für kleine/große $p$. Damit ist das Konfidenzintervall oft zu groß.
+				\item Schätze die Standardabweichung durch 
+				\begin{align*}
+					\sqrt{\frac{\hat{p}(1-\hat{p})}{n}}
+				\end{align*}
+				Hier gilt für $n\to\infty$ mit $\hat{p}_n=\hat{p}$ nach dem Zentralen Grenzwertsatz:
+				\begin{align*}
+					\sqrt{n}\frac{\hat{p}_n-p}{\sqrt{p(1-p)}}\xrightarrow{d}N(0,1)
+				\end{align*}
+				Das Gesetz der großen Zahlen liefert zudem auch Konsistenz des Schätzers:
+			\begin{align*}
+				\hat{p}_n\xrightarrow{P}p
+			\end{align*}
+			Also gilt für $p\in (0,1)$:
+			\begin{align*}
+				\frac{\sqrt{p(1-p)}}{\sqrt{\hat{p}_n(1-\hat{p}_n)}}\xrightarrow[n\to\infty]{P}1
+			\end{align*}
+			Slutskys Lemma (siehe unten) liefert:
+			\begin{align*}
+				\sqrt{n}\frac{\hat{p}_n-p}{\sqrt{\hat{p}_n(1-\hat{p}_n)}}=\underbrace{\sqrt{n}\frac{\hat{p}_n-p}{\sqrt{p(1-p)}}}_{\xrightarrow{d}N(0,1)}\underbrace{\frac{\sqrt{p(1-p)}}{\sqrt{\hat{p}_n(1-\hat{p}_n)}}}_{\xrightarrow{P}1}\xrightarrow{d}N(0,1)
+			\end{align*}
+			Und damit:
+			\begin{align*}
+				\tilde{I}_{1-\alpha}^n=\left[\hat{p}_n-q_{1-\alpha/2}\sqrt{\frac{\hat{p}_n(1-\hat{p}_n)}{n}},\hat{p}_n+q_{1-\alpha/2}\sqrt{\frac{\hat{p}_n(1-\hat{p}_n)}{n}}\right]
+			\end{align*}
+			ist im folgenden Sinne asymptotisches $(1-\alpha)$-Konfidenzintervall:
+			\begin{align*}
+				\forall p\in [0,1]\colon~\lim_{n\to\infty}P_p\left(p\in\tilde{I}_{1-\alpha}^n\right)=1-\alpha
+			\end{align*}
+		\end{enumerate}
+		Konkret bedeutet dies für $\hat{p}=0,1$ und $\alpha=0,05$:
+		\begin{enumerate}
+			\item[]1. Möglichkeit: $I_{1-\alpha}\approx [0,07;0,13]$
+			\item[]2. Möglichkeit: $\tilde{I}_{1-\alpha}^n\approx[0,08;0,12]$
+		\end{enumerate}
+		\end{example}
+		\begin{lemma}[Slutskys Lemma]
+			Für Zufallsvariablen $(X_n,Y_n)_{n\ge 1}$ mit $X_n\xrightarrow{d}X$, $Y_n\xrightarrow{P}a$ für eine Zufallsvariable $X$ und eine reelle Zahl $a$ gilt:
+			\begin{align*}
+				X_n+Y_n\xrightarrow{d}X+a\text{ sowie }X_nY_n\xrightarrow{d}aX
+			\end{align*}
+		\end{lemma}
+		\begin{proof}
+			Stochastik II
+		\end{proof}
+				
+	\subsection{Testen}
+		
+		\begin{motivation}[Erkenntnistheorie]
+			Aus grundsätzlichen Überlegeungen heraus wird eine Theorie entwickelt, die empirisch überprüft werden soll. Theorien können hierbei nie empirisch verifiziert, sondern nur falsifiziert werden. Die \Wk, dass die Theorie ("`Nullhypothese"') korrekt ist, aber falsifiziert wird ("`Fehler erster Art"') sollte möglichst gering sein. ANdererseits soll natürlich eine falsche Theorie nur mit geringer \Wk~anhand der Daten akzeptiert (d.h. nicht falsifiziert) werden ("`Fehler zweiter Art"').
+		\end{motivation}
+		\begin{definition}
+			Es seien eine statistisches Modell $\left(\mathcal{X},\mathscr{F},\seq{P_\theta}{\theta}{\Theta}\right)$ sowie eine Partition $\Theta=\Theta_1\cupdot\Theta_2$ der Parametermenge in nichtleere Teilmengen $\Theta_1,\Theta_2$ gegeben. Ein \emph{nichtrandomisierter Test} der Nullhypothese $H_0$: $\theta\in\Theta_0$ gegen die Alternative $H_1$: $\theta\in\Theta_1$ ist eine messbare Funktion $\phi\colon~\mathcal{X}\to\{0,1\}$ mit der Interpretation, dass $\phi(x)=1$ das Ablehnen von $H_0$ bei Realisierung $x$ und $\phi(x)=0$ das Akzeptieren von $H_0$ bei Realisierung $x$ bedeutet.
+			
+			Der Test $\phi$ besitzt \emph{Niveau} $\alpha\in[0,1]$, falls
+			\begin{align*}
+				\sup_{\theta\in\Theta_0}P_\theta (\phi=1)\le\alpha
+			\end{align*}
+			gilt, d.h. die \Wk~für einen Fehler erster Art maximal $\alpha$ beträgt. Entsprechendes wird als \emph{Fehlerwahrscheinlichkeit zweiter Art} bei $\theta\in\Theta_1$ bezeichnet.
+		\end{definition}
+		\begin{remark}
+			Bei diskreten \Wk en (z.B. Test, ob eine Münze fair ist) existiert oft kein Test, der das Niveau $\alpha$ ausschöpft, d.h.
+			\begin{align*}
+				\sup_{\theta\in\Theta}P_\theta(\phi=1)<\alpha\text{ für alle }\sup_{\theta\in\Theta}P_\theta(\phi=1)\le\alpha
+			\end{align*}
+			Daher erlaubt man auch randomisierte Tests $\phi\colon~\mathcal{X}\to[0,1]$ mit der Interpretation, dass für $\phi(x)\in(0,1)$ ein zusätzliches unabhängiges Zufallsexperiment ausgeführt wird, das mit \Wk~$\phi(x)$ die Nullhypothese ablehnt. Dann gilt für die Fehlerwahrscheinlichkeit erster Art bei $\theta\in\Theta$:
+			\begin{align*}
+				\int_\mathcal{X}\phi(x)P_\theta(dx)=\mathrm{E}_\theta[\phi]
+			\end{align*}
+		\end{remark}
+		\begin{definition}
+			Im statistischen Modell $\left(\mathcal{X},\mathscr{F},\seq{P_\theta}{\theta}{\Theta}\right)$ mit $\Theta=\Theta_0\cupdot\Theta_1$ heißt jede messbare Funktion $\phi\colon~\mathcal{X}\to[0,1]$ (\emph{randomisierter}) \emph{Test}. Ein solcher Test besitzt \emph{Niveau} $\alpha$, fall
+			\begin{align*}
+				\sup_{\theta\in\Theta_0}\mathrm{E}_\theta[\phi]\le\alpha
+			\end{align*}
+			ist. Die \emph{Fehlerwahrscheinlichkeit zweiter Art} ist gegeben durch
+			\begin{align*}
+				\mathrm{E}_\theta[1-\phi]
+			\end{align*}
+			bei $\theta\in\Theta_1$.
+		\end{definition}
+		\begin{remark}
+			Aus mathematischer Sicht haben randomisierte Tests den großen Vorteil, eine konvexe Menge zu bilden. Im Fall \emph{einfacher Hypothesen} (d.h. $\Theta_0=\{0\},\Theta_1=\{1\},\Theta=\{0,1\}$) gibt es eine Testkonstruktion, die für gegebenes Niveau $\alpha$ die Fehlerwahrscheinlichkeit zweiter Art minimiert:
+		\end{remark}
+		\begin{lemma}[Neymann-Pearson]\label{NP-Lemma}
+			Sei $\left(\mathcal{X},\mathscr{F},\{P_0,P_1\}\right)$ ein (binäres) statistisches Modell. Besitzen $P_0,P_1$ Dichten $p_0,p_1$ bzgl einem Maß $\mu$ und ist $\phi_\alpha$ eine (ggf. randomisierter) Test mit Niveau $\alpha=\mathrm{E}_0\left[\phi_\alpha\right]$ der Form
+			\begin{align*}
+				\phi_\alpha(x)=\begin{cases}1,&\text{ falls }p_1(x)>c_\alpha p_2(x)\\0,&\text{ falls }p_2(x)<c_\alpha p_0(x)\\\gamma_\alpha,&\text{ falls }p_1(x)=c_\alpha p_0(x)\end{cases}
+			\end{align*}			
+			für $c_\alpha\ge 0$ und $\gamma_\alpha\in[0,1]$ geeignet. Dann gilt für die Fehlerwahrscheinlichkeit zweiter Art:
+			\begin{align*}
+				\mathrm{E}_1\left[1-\phi_\alpha\right]=\inf_{\bar{\phi}_\alpha}\mathrm{E}_1\left[1-\bar{\phi}\right],
+			\end{align*}
+			wobei sich das Infimum über alle Tests $\bar{\phi}_\alpha$ vom Niveau $\alpha$ erstreckt.
+		\end{lemma}
+		\begin{proof}
+			Wir zeigen, dass für beliebige Tests $\bar{\phi}_\alpha$ vom Niveau $\alpha$ gilt:
+			\begin{align*}
+				\mathrm{E}_1\left[\bar{\phi}_\alpha-\phi_\alpha\right]\le 0
+			\end{align*}
+			Dies impliziert die Behauptung. Es ergibt sich:
+			\begin{align*}
+				\mathrm{E}_1\left[\bar{\phi}_\alpha-\phi_\alpha\right]=&\int_\mathcal{X}\left(\bar{\phi}_\alpha-\phi_\alpha\right)p_1d\mu\\
+				=&\int_{\{p_1>c_\alpha p_0\}}\underbrace{\bigg(\bar{\phi}_\alpha-\underbrace{\phi_\alpha}_{=1}\bigg)}_{\le 0}\underbrace{p_1}_{>c_\alpha p_0}d\mu+\int_{\{p_1<c_\alpha p_0\}}\underbrace{\bigg(\bar{\phi}_\alpha-\underbrace{\phi_\alpha}_{=0}\bigg)}_{\ge 0}\underbrace{p_1}_{<c_\alpha p_0}d\mu+\\
+				&+\int_{\{p_1=c_\alpha p_0\}}\bigg(\bar{\phi}_\alpha-\phi_\alpha\bigg)\underbrace{p_1}_{=c_\alpha p_0}d\mu\\
+				\le&\int_{\{p_1>c_\alpha p_0\}}\left(\bar{\phi}_\alpha-\phi_\alpha\right)c_\alpha p_0d\mu+\int_{\{p_1<c_\alpha p_0\}}\left(\bar{\phi}_\alpha-\phi_\alpha\right)c_\alpha p_0d\mu+\int_{\{p_1=c_\alpha p_0\}}\left(\bar{\phi}_\alpha-\phi_\alpha\right)c_\alpha p_0d\mu\\
+				=&c_\alpha\int_\mathcal{X}\left(\bar{\phi}_\alpha-\phi_\alpha\right)p_0d\mu\\
+				=&\underbrace{c_\alpha}_{\ge 0}\bigg(\underbrace{\mathrm{E}_0\left[\bar{\phi}_\alpha\right]}_{\le\alpha}-\underbrace{\mathrm{E}_0[\phi]}_{=\alpha}\bigg)\\
+				\le&0
+			\end{align*}
+		\end{proof}
+		\begin{remark}
+			Folgendes ist zum Neymann-Pearson Lemma (Lemma \ref{NP-Lemma}) zu beachten:
+			\begin{enumerate}[a)]
+				\item Tests in der Form des Lemmas heißen \emph{Neymann-Pearson-Tests}.
+				\item Man kann sets ein dominierendes Maß (z.B. $\mu=P_0+P_1$) wählen.
+				
+				Die Testkonstruktion hängt dabei nicht von der Wahl von $\mu$ ab.
+				\item Man sagt auch, dass Neymann-Pearson-Tests \emph{UMP} (\emph{uniformly most powerful}) unter allen Tests vom Niveau $\alpha$ sind. Die \emph{Mächtigkeit} oder \emph{Power} eines Tests $\phi$ ist gerade
+				\begin{align*}
+					1-\text{Fehlerwahrscheinlichkeit zweiter Art}
+				\end{align*}
+				d.h.
+				\begin{align*}
+					\mathrm{E}_\theta[\phi]
+				\end{align*}
+				für $\theta\in\Theta_1$.
+			\end{enumerate}
+		\end{remark}
+		\begin{example}[Gauß-Test]
+			Betrachte $X_1,\dots,X_n\overset{\text{iid}}{\sim}N(\mu,\sigma^2)$ mit $\mu$ unbekannt und $\sigma>0$ bekannt. Die Nullhypothese ist $H_0$: $\mu=\mu_0$ und die Alternative ist $H_1$: $\mu=\mu_1$ für gegebene Werte $\mu_0>\mu_1$. Wir möchten den Neymann-Pearson-Test für dieses Problem bestimmen. Das statistische Modell ist gegeben durch
+			\begin{align*}
+				\mathcal{X}=\mathbb{R}^n,~\mathscr{F}\coloneq\mathscr{B}_{\mathbb{R}^n},P_i=N(\mu_i,\sigma^2)^{\otimes n}\text{ für }i=1,2\text{ und }\mu\text{ ist das Lebesquemaß auf }\mathbb{R}^n
+			\end{align*}
+			Die Wahrscheinlichkeitsdichten sind für $j=1,2$ also
+			\begin{align*}
+				p_j=\Pi{i=1}^n\left(2\pi\sigma^2\right)^{-1/2}\exp{-\frac{-(x_i-\mu_j)^2}{2\sigma^2}}
+			\end{align*}
+			und damit
+			\begin{align*}
+				\frac{p_1(x)}{p_2(x)}=&\Pi_{i=1}^n\exp{-\frac{(x_i-\mu_1)^2-(x_i-\mu_0)^2}{2\sigma^2}}\\
+				=&\exp{-\frac{\sum_{i=1}^n2(\mu_1-\mu_0)x_i+\mu_1^2-\mu_0^2}{2\sigma^2}}\\
+				>&c_\alpha\\
+				&\Leftrightarrow \sum_{i=1}^n x_i<\tilde{c}_\alpha\text{ für }\tilde{c}_\alpha\in\mathbb{R}\text{ geeignet}
+			\end{align*}
+			Damit ergibt sich mit
+			\begin{align*}
+				\bar{x}=\frac{1}{n}\sum_{i=1}^nx_i/\text{ und }\tilde{\tilde{c}}_\alpha=\frac{\tilde{c}_\alpha}{n}\text{ und }\gamma_\alpha\in[0,1]\text{ beliebig}
+			\end{align*}			 
+			 als Neymann-Pearson-Test:
+			\begin{align*}
+				\phi_\alpha(x)=\indicator\left(\bar{x}<\tilde{\tilde{c}}_\alpha\right)+\gamma_\alpha\indicator\left(\bar{x}?\tilde{\tilde{c}}_\alpha\right)
+			\end{align*}
+			Da unter $P_0$ und $P_1$ $\bar{x}\neq\tilde{\tilde{c}}_\alpha$ fast sicher gilt, können wir $\phi_\alpha$ auf einer $(P_0+P_1)$-Nullmenge zu
+			\begin{align*}
+				\phi_\alpha=\indicator\left(\bar{x}\le \tilde{\tilde{c}}_\alpha\right)
+			\end{align*}
+			abändern. Unter $H_0$ gilt nun:
+			\begin{align*}
+				&P_0(\phi_\alpha=1)=P_0(\bar{X}\le \tilde{\tilde{c}}_\alpha)=P\left(\mu_0+\frac{\sigma}{\sqrt{n}}Z\le\tilde{\tilde{c}}_\alpha\right)=P\left(Z\le\left(\tilde{\tilde{c}}_\alpha-\mu_0\right)\frac{\sqrt{n}}{\sigma}\right)\overset{!}{=}\alpha\\
+				&\Leftrightarrow \left(\tilde{\tilde{c}}_\alpha-\mu_0\right)\frac{\sqrt{n}}{\sigma}=q_\alpha
+			\end{align*}
+			wobei $q_\alpha$ das $\alpha$-Quantil von $N(0,1)$ ist. Also wähle
+			\begin{align*}
+				\tilde{\tilde{c}}_\alpha=\mu_0+q_\alpha\frac{\sigma}{\sqrt{n}}
+			\end{align*}
+			sodass $\phi_\alpha=\indicator\left(\bar{x}-\mu_0\le q_\alpha\sigma/\sqrt{n}\right)$ Neymann-Pearson-Test ist, der das Niveau $\alpha$ ausschöpft. Beachte weiterhin, dass
+			\begin{enumerate}[a)]
+				\item $\phi_\alpha$ is unabängig von $\mu_1<\mu_0$.
+				\item Auch für $\mu>\mu_0$ gilt $P_\mu(\phi_\alpha=1)\le\alpha$
+			\end{enumerate}
+			Damit ist $\phi_\alpha$ \emph{einseitiger Test} von $H_0$: $\mu\ge\mu_0$ gegen $H_1$: $\mu<\mu_0$ zum Niveau $\alpha$. Ein einfaches Argument zeigt die UMP-Eigenschaft auch für dieses Testproblem. $\phi_\alpha$ heißt \emph{Gauß-Test}.
+		\end{example}
+		\begin{definition}
+			Es sei $\left(\mathcal{X},\mathscr{F},\seq{P_\theta}{\theta}{\Theta}\right)$ ein statistisches Modell mit Likelihoodfunktion $L$ und $\Theta=\Theta_0\cupdot\Theta_1$ eine (nicht-triviale) Partition. Ein Test auf $H_0$: $\theta\in\Theta_0$ gegen $H_1$: $\theta\in\Theta_1$ der Form
+			\begin{align*}
+				\phi_\alpha=\indicator\left(\sup_{\theta\in\Theta_1}L(\theta)>c_\alpha \sup_{\theta\in\Theta_0}L(\theta)\right)+\gamma_\alpha \indicator\left(\sup_{\theta\in\Theta_1}L(\theta)=c_\alpha \sup_{\theta\in\Theta_0}L(\theta)\right)
+			\end{align*}
+			mit $c_\alpha\ge 0$, $\gamma_\alpha\in[0,1]$ geeignet, heißt \emph{Likelihood-Quotitenten-Test} (\emph{LR-Test}, \emph{likelihood ration test}).
+		\end{definition}
+		\begin{remark}
+			Unter Regularitätsbedingungen an $L$ und für asymptotisch große Stichprobenumfänge kann man optimale Eigenschaften von LR-Tests beweisen. Hier sehen wir es als konkrete Konstruktion an, deren Eigenschaften im Einzelfall nachgewiesen werden können.
+			
+			Ist $\hat{\theta}_1$ ein MLE für $\theta\in\Theta_1$ und $\hat{\theta}_0$ ein MLE für $\theta\in\Theta_0$, so gilt:
+			\begin{align*}
+				\phi_\alpha=\indicator\left(L(\hat{\theta}_1)>c_\alpha L(\hat{\theta}_0)\right)+\gamma_\alpha \indicator\left(L(\hat{\theta}_1)=c_\alpha L(\hat{\theta}_0)\right)
+			\end{align*}
+		\end{remark}
+		\begin{example}[t-Test]
+			Sei
+			\begin{align*}
+				&\theta=(\mu,\sigma^2),~\Theta=\{(\mu,\theta)|~\mu\in\mathbb{R},\sigma>0\}, P_\theta=N(\mu,\sigma^2)^{\otimes n}\quad\text{d.h. }X_1,\dots,X_n\overset{\text{iid}}{\sim}N(\mu,\sigma^2)\text{ sowie}\\
+				&H_0\colon~\mu=\mu_0\text{ und }H_1\colon~\mu\neq \mu_0
+			\end{align*}
+			Die Likelihoodfunktion hat die Form:
+			\begin{align*}
+				L(\mu,\sigma^2)=(2\pi)^{-n/2}\sigma^{-n}\exp{-\frac{1}{2\sigma^2}\sum_{i=1}^n(X_i-\mu)^2}
+			\end{align*}
+			dies ergibt auf $H_0$: $\mu=\mu_0$ bekannt den MLE:
+			\begin{align*}
+				\hat{\sigma}_0^2=\frac{1}{n}\sum_{i=1}^n(X_i-\mu_0)^2
+			\end{align*}
+			Auf $H_1$ erigbt sich der MLE
+			\begin{align*}
+				\hat{\mu}=\bar{X}=\frac{1}{n}\sum_{i=1}^n(X_i-\mu_0)^2\text{ sowie }\hat{\sigma}_1^2=\frac{1}{n}\sum_{i=1}^n(X_i-\bar{X})^2=\colon\bar{\sigma}^2\leadsto\text{ "`empirische Standardabweichung"'}
+			\end{align*}
+			Für den Likelihood-Quotienten ergibt sich:
+			\begin{align*}
+				\frac{\sup_{\theta_1\in\Theta_1}L(\theta_1)}{\sup_{\theta_0\in\Theta_0}L(\theta_0)}=&\frac{\hat{\sigma}_1^{-n}\exp{-\frac{1}{2\hat{\sigma}_1^2}n\hat{\sigma}_1^2}}{\hat{\sigma}_0^{-n}\exp{-\frac{1}{2\hat{\sigma}_0^2}n\bar{\sigma}_0^2}}\\
+				=&\left(\frac{\frac{1}{n}\sum_{i=1}^n\left(X_i-\bar{X}+\bar{X}-\mu_0\right)^2}{\bar{\sigma}^2}\right)^{n/2}\\
+				=&\left(\frac{\frac{1}{n}\sum_{i=1}^n\left(X_i-\bar{X}\right)^2+\left(\bar{X}-\mu_0\right)^2}{\bar{\sigma}^2}\right)^{n/2}\\
+				=&\left(1+\frac{\left(\bar{X}-\mu_0\right)^2}{\bar{\sigma}^2}\right)^{n/2}
+			\end{align*}
+			Damit hat der LR-Test die Form (ohne Randomisierung):
+			\begin{align*}
+				\phi_\alpha=\indicator\left(\frac{\left|\bar{X}-\mu\right|}{\bar{\sigma}}\ge c_\alpha\right)
+			\end{align*}
+			Dies ist der wichtige \emph{t-Test}!
+			
+			Nach dem Zentralen Grenzwertsatz und dem Lemma von Slutsky gilt unter $H_0$:
+			\begin{align*}
+				\bar{X}-\mu_0\sim N\left(0,\frac{\sigma^2}{n}\right)\Rightarrow \sqrt{n}\frac{\bar{X}-\mu_0}{\bar{\sigma}}=\underbrace{\sqrt{n}\frac{\bar{X}-\mu_0}{\sigma}}_{\xrightarrow{d}N(0,1)}\underbrace{\frac{\sigma}{\bar{\sigma}}}_{\xrightarrow{P}1}\xrightarrow[n\to\infty]{d}N(0,1)
+			\end{align*}
+			Für große $n$ kann man daher 
+			\begin{align*}
+				c_\alpha=\frac{q_{1-\frac{\alpha}{2}}}{\sqrt{n}}
+			\end{align*}
+			als kritischen Wert benutzen. Exakt lässt sich $c_\alpha$ über die t-Verteilung bestimmen.
+		\end{example}
+		\begin{motivation}
+			In der Praxis (Statistik-Software) wird bei gegebenen Daten $x$ meist der $p$-Wert $p(x)$ angegeben, mit der Interpretation, dass für jedes Niveau $\alpha>p(x)$ der Test $H_0$ abgelehnt und für jedes Niveau $\alpha<p(x)$ $H_0$ akzeptiert hätte.
+		\end{motivation}
+		\begin{definition}
+			Es sei $\seq{\phi_\alpha}{\alpha}{(0,1)}$ eine Familie nicht-randomisierter Tests vom Niveau $\alpha$ für $H_0$ gegen $H_1$. Sind die Tests geordnet in dem Sinne, dass $\phi_\alpha(x)=1$ und $\alpha'>\alpha$ implizieren $\phi_{\alpha'}(x)=1$, d.h. $\alpha\mapsto \phi_\alpha(x)$ ist wachsend für jedes $x\in\mathcal{X}$. Dann heißt
+			\begin{align*}
+				p(x)\coloneq\inf\{\alpha\in(0,1)|~\phi_\alpha=1\}
+			\end{align*}
+			\emph{$p$-Wert} von $\seq{\phi_\alpha}{\alpha}{(0,1)}$ bei den Daten $x$.
+		\end{definition}
+		\begin{lemma}
+			Für $\alpha>p(x)$ gilt dann $\phi_\alpha(x)=1$ und für $\alpha<p(x)$ gilt $\phi_\alpha(x)=0$.
+		\end{lemma}
+		\begin{proof}
+			Klar.
+		\end{proof}
+		\begin{remark}
+			Konzeptionell darf das Niveau eines Tests \emph{nie} nach der Datenerhebung festgelegt werden.
+		\end{remark}
+		\begin{lemma}[Konsistenzsatz]
+			OFFEN
+		\end{lemma}
+		
+%======================================================
+\newpage
+\section{Das lineare Modell}
+
+	\subsection{Lineares Modell und kleinste Quadrate}
+	
+		\begin{motivation}
+			Für Beobachtungen $Y_1,\dots, Y_n$ abhängig von Daten $X_1,\dots, X_n$ betrachten wir das Modell
+			\begin{align*}
+				Y_i=ax_i+b+\epsilon_i,\quad i=1,\dots,n
+			\end{align*}
+			mit $x_i$ deterministisch bekannt, $a,b\in\mathbb{R}$ deterministisch und unbekannt und Zufallsvariablen $\epsilon_i$ mit $\EW{\epsilon_i}=0$, $\text{Var}(\epsilon_i)=\sigma^2>0$ und $(\epsilon_i)_{1\le i\le n}$ iid.
+			
+			Man bestimmt eine \emph{Regressionsgerade} der Form $y=\hat{a}x+\hat{b}$ mit Schätzern $\hat{a}$ and $\hat{b}$ aus den Beobachtungen über die \emph{Methode der Kleinsten Quadrate}:
+			\begin{align*}
+				(\hat{a},\hat{b})\coloneq\text{argmin}_{(a,b)\in\mathbb{R}^2}\sum_{i=1}^n\left(Y_i-(aX_i+b)\right)^2
+			\end{align*}
+			OFFEN: Vergleich mit Skript "`Mathematische Statistik"'
+		\end{motivation}
+		\begin{definition}
+			Ein (\emph{reguläres}) \emph{lineares Modell} mit $n$ reellwertigen Beobachtungen $Y=(Y_1,\dots, Y_N)^T$ und $p$-dimensionalem Parameter $\beta\in\mathbb{R}^p$, $p\le n$ besteht aus einer \emph{Designmatrix} $X\in\mathbb{R}^{n\times p}$ von vollem Rang $p$ und einem \emph{Fehlervektor} $\epsilon=(\epsilon_1,\dots,\epsilon_n)^T$ von Zufallsvariablen mit $\EW{\epsilon_i}=0$, $\text{Cov}(\epsilon_i,\epsilon_j)=\Sigma_{ij}$ für eine (strikt) positiv-definite Matrix $\sigma\in\mathbb{R}^{n\times n}$. Beobachtet wird
+			\begin{align*}
+				Y=X\beta+\epsilon
+			\end{align*}
+			Der \emph{Kleinste-Quadrate-Schätzer} $\hat{\beta}$ von $\beta$ erfüllt
+			\begin{align*}
+				\left|\Sigma^{-1/2}\left(X\hat{\beta}-Y\right)^2\right|=\inf_{\beta\in\mathbb{R}^p}\left|\Sigma^{-1/2}\}\left(X\beta-Y\right)\right|^2
+			\end{align*}
+			Im \emph{gewöhnlichen} linearen Modell gilt
+			\begin{align*}
+				\Sigma=\sigma^2 E_n,\quad\sigma>0
+			\end{align*}
+			und wir erhalten den \emph{OLS} (\emph{ordinary least squares})-\emph{Schätzer} $\hat{\beta}$ via
+			\begin{align*}
+				\left|X\hat{\beta}-Y\right|^2=\inf_{\beta\in\mathbb{R}^p}\left|X\beta-Y\right|_{\mathbb{R}^n}^2
+			\end{align*}
+		\end{definition}						
+		
+\end{document}
